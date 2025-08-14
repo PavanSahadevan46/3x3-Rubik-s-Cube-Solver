@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { Wireframe } from "three/examples/jsm/Addons.js";
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -15,46 +16,34 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const cube1 = new THREE.Mesh(
-  new THREE.BoxGeometry(1,1,1),
-  new THREE.MeshPhongMaterial({color: 0xff0000})
-);
-cube1.position.set(3,0,0)
-
-const cube2 = new THREE.Mesh(
-  new THREE.BoxGeometry(1,1,1),
-  new THREE.MeshPhongMaterial({color: 0x0000ff})
-);
-cube2.position.set(-3,0,0)
-
-const cube3 = new THREE.Mesh(
-  new THREE.BoxGeometry(1,1,1),
-  new THREE.MeshPhongMaterial({color: 0x00ff00})
-);
-cube3.position.set(0,0,0)
-
-
-
-
 camera.position.z = 5;
-
-scene.add(cube1,cube2,cube3,);
-
 const AmbientLight = new THREE.AmbientLight(0xffffff);
 
-AmbientLight.position.set(50,50,50);
+AmbientLight.position.set(50, 50, 50);
 
 scene.add(AmbientLight);
 
-// const gridHelper = new THREE.GridHelper(200, 500);
-// // scene.add(gridHelper);
+const gridHelper = new THREE.GridHelper(200, 500);
+scene.add(gridHelper);
 
+let mat = (clr: string) => new THREE.MeshStandardMaterial({ color: clr });
 
-const cubeGroup =  new THREE.Group();
+let cubelet = new THREE.Mesh(new THREE.BoxGeometry(), [
+  mat("blue"),
+  mat("green"),
+  mat("white"),
+  mat("yellow"),
+  mat("red"),
+  mat("orange"),
+]);
 
-cubeGroup.add(cube1,cube2,cube3)
-
-
+for (let x = -1; x <= 1; x++)
+  for (let y = -1; y <= 1; y++)
+    for (let z = -1; z <= 1; z++) {
+      let c = cubelet.clone();
+      scene.add(c);
+      c.position.set(x, y, z).multiplyScalar(1.1);
+    }
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
