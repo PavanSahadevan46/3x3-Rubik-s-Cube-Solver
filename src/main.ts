@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { Wireframe } from "three/examples/jsm/Addons.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -16,34 +17,25 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-camera.position.z = 5;
+camera.position.z = 10;
+camera.position.y = 10;
+camera.position.x = 12;
 const AmbientLight = new THREE.AmbientLight(0xffffff);
 
 AmbientLight.position.set(50, 50, 50);
 
 scene.add(AmbientLight);
+const loader = new GLTFLoader().setPath("/models/");
 
-const gridHelper = new THREE.GridHelper(200, 500);
-scene.add(gridHelper);
+loader.load("rubik3x3.glb", (gltf) => {
+  const cube = gltf.scene;
+  cube.position.set(0, 0, 0);
+  cube.traverse(e=>console.log(e.name));
+  // var cube1 = cube.getObjectByName("Cube001");
+  // cube1.position.set(5, 0, 0);
 
-let mat = (clr: string) => new THREE.MeshStandardMaterial({ color: clr });
-
-let cubelet = new THREE.Mesh(new THREE.BoxGeometry(), [
-  mat("blue"),
-  mat("green"),
-  mat("white"),
-  mat("yellow"),
-  mat("red"),
-  mat("orange"),
-]);
-
-for (let x = -1; x <= 1; x++)
-  for (let y = -1; y <= 1; y++)
-    for (let z = -1; z <= 1; z++) {
-      let c = cubelet.clone();
-      scene.add(c);
-      c.position.set(x, y, z).multiplyScalar(1.1);
-    }
+  scene.add(cube);
+});
 
 const controls = new OrbitControls(camera, renderer.domElement);
 
